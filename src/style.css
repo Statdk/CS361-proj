@@ -16,7 +16,15 @@
   --yellow: #f1fa8c;
 }
 
+* {
+  font-family: "Iosevka SS17 Web", "bootstrap-icons";
+}
+
 body {
   color: var(--foreground);
   background-color: var(--background);
+}
+
+.divider {
+  border: 1px solid var(--curLine);
 }

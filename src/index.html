@@ -2,12 +2,31 @@
 <html>
   <head>
     <title>Warframe Search Tool</title>
+    <link href="./iosevka-font/IosevkaSS17.css" rel="stylesheet" />
+    <link href="./bootstrap-icons-font/bootstrap-icons.css" rel="stylesheet" />
     <link href="./style.css" rel="stylesheet" />
   </head>
 
   <body>
-    Ello
+    <h1>Warframe Search Tool</h1>
+    <div>
+      Search Type:
+      <select>
+        <option>Equipment</option>
+        <option>Relics</option>
+      </select>
+    </div>
 
-    <script src="./index.js"></script>
+    <div class="organizer">
+      <div class="searchContainer">
+        <div>
+          <input type="text" placeholder="Search terms" />
+          <button>Search &#xF52A;</button>
+        </div>
+      </div>
+      <div class="detailContainer"></div>
+    </div>
+
+    <script src="./renderer.js"></script>
   </body>
 </html>
