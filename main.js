@@ -4,7 +4,7 @@ const path = require("path");
 function startWindow() {
   const window = new electron.BrowserWindow({
     width: 1200,
-    height: 800,
+    height: 950,
     webPreferences: {
       preload: path.join(__dirname, "src", "preload.js"),
     },
