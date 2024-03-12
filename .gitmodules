@@ -1,0 +1,3 @@
+[submodule "cs361_warframe_microservice"]
+	path = cs361_warframe_microservice
+	url = git@github.com:timjohansen/cs361_warframe_microservice.git
