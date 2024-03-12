@@ -7,6 +7,7 @@ function startWindow() {
     height: 950,
     webPreferences: {
       preload: path.join(__dirname, "src", "preload.js"),
+      nodeIntegration: true,
     },
   });
 

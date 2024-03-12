@@ -5,6 +5,7 @@
     <link href="./font-iosevka/IosevkaSS17.css" rel="stylesheet" />
     <link href="./font-bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
     <link href="./style.css" rel="stylesheet" />
+    <script type="module" src="./renderer.mjs" defer></script>
   </head>
 
   <body>
@@ -31,6 +32,21 @@
               <option value="equipment">&#xF8E6; Equipment</option>
               <option value="relics">&#xF1C8; Relics</option>
             </select>
+            <div>
+              <label id="isPrimeLabel" for="isPrime">Prime:</label>
+              <input id="isPrime" name="isPrime" type="checkbox" />
+            </div>
+            <div>
+              <label id="isVaultedLabel" for="isVaulted" class="unavailable"
+                >Vaulted:</label
+              >
+              <input
+                id="isVaulted"
+                name="isVaulted"
+                type="checkbox"
+                disabled="disabled"
+              />
+            </div>
           </div>
         </div>
         <div class="resultBin" id="results"></div>
@@ -38,7 +54,12 @@
       <div class="detailContainer alignRight">
         <div>
           <div class="previewImg alignRight">
-            <img id="preview" height="247" width="247" />
+            <img
+              id="preview"
+              height="247"
+              width="247"
+              src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            />
           </div>
           <div id="ImageSRC" class="caption defaultCursor alignRight"></div>
         </div>
@@ -143,7 +164,5 @@
         </div>
       </div>
     </div>
-
-    <script src="./renderer.js"></script>
   </body>
 </html>

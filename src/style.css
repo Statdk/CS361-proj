@@ -73,6 +73,8 @@ option {
 .organizer {
   display: flex;
 
+  min-height: 800px;
+
   margin: auto;
   padding: 10px;
 
@@ -101,9 +103,13 @@ option {
 
   height: 400px;
 
+  overflow-y: auto;
+  scrollbar-width: thin;
+
   background-color: #00001150;
 
   border: 2px solid black;
+  border-radius: 15px;
 }
 
 .resultItem {
@@ -200,4 +206,20 @@ tr:hover {
 
 .defaultCursor {
   cursor: default;
+}
+
+.unavailable {
+  color: gray;
+}
+
+.scrollx {
+  overflow-x: auto;
+}
+
+.scrolly {
+  overflow-y: auto;
+}
+
+.locTableWrap {
+  max-height: 133px;
 }

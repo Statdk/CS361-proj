@@ -1,18 +1,19 @@
 {
-  "name": "warframe-search-tool",
-  "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "electron": "^28.2.2"
-  },
-  "dependencies": {
-    "ejs": "^3.1.9"
-  }
+    "name": "warframe-search-tool",
+    "version": "1.0.0",
+    "description": "",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "start --debug": "ELECTRON_ENABLE_LOGGING=1 electron ."
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "electron": "^28.2.2"
+    },
+    "dependencies": {
+        "ejs": "^3.1.9"
+    }
 }
