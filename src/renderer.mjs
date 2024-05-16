@@ -1,59 +1,33 @@
-import * as db from "./db.mjs"
+import * as db from "./db.mjs";
 
-function select(currElement, type, data) {
+function selectResult(element) {
   let resultBin = document.getElementById("results");
   if (resultBin !== null) {
     for (const result of resultBin.children) {
       result.classList.remove("selected");
     }
-  }
-  else {
+  } else {
     console.log("Where bin?");
   }
 
-  currElement.classList.add("selected");
-  if (type == undefined && data == undefined) {
-    return;
-  }
+  element.classList.add("selected");
+}
 
-  console.log(data);
-
+function setImage(imageName) {
   try {
     let preview = document.getElementById("preview");
     let source = document.getElementById("ImageSRC");
 
     preview.setAttribute("src", "");
-    preview.setAttribute("src", `https://cdn.warframestat.us/img/${data.imageName}`);
-    source.innerText = `Image From "https://cdn.warframestat.us/img/${data.imageName}"`;
+    preview.setAttribute("src", `https://cdn.warframestat.us/img/${imageName}`);
+    source.innerText = `Image From "https://cdn.warframestat.us/img/${imageName}"`;
   } catch (error) {
     console.error(`Unable to set image ${error}`);
   }
+}
 
-  /*
-Type: Primary Rifle | Mastery Requirement: 8
-Max Rank: 30        | Trigger Type: auto
-
-
-Accuracy: 200       | Crit Chance: 30%
-Fire Rate: 5.7/s    | Crit Multiplier: 3.0x
-Multishot: 1        | Status Chance: 30%
-
-
-Damage Types:
-
- Puncture    | Impact     | Slash
-        2.8  |      28    |     39.2
-
-Total: 70
-   */
-
-  try {
-    let dataField = document.getElementById("dataField");
-    if (dataField === null) {
-      throw "No dataField";
-    }
-    if (type == "equipment") {
-      dataField.innerHTML = `
+function setDataEquipment(data) {
+  dataField.innerHTML = `
     <table class="centerData">
     <tr>
       <th colspan="4">Equipment Stats</th>
@@ -101,205 +75,228 @@ Total: 70
     </tr>
   </table>
     `;
-    } else if (type == "relics") {
-      let common = [];
-      let uncommon = [];
-      let rare = [];
+}
 
-      for (const reward of data.rewards) {
-        if (reward.chance > 20) {
-          common.push(reward);
-        } else if (reward.chance > 5) {
-          uncommon.push(reward);
-        } else {
-          rare.push(reward)
-        }
-      }
+function sortRewards(dataRewards) {
+  const rewards = { common: [], uncommon: [], rare: [] };
 
-      let gonnaBeHTML = `
-      <table class="alignRight">
-      <tr>
-        <th colspan="3">${data.name}</th>
-      </tr>
-      <tr>
-        <th colspan="3">Drops</th>
-      </tr>
-      <tr>
-        <th>Common</th>
-        <th>Uncommon</th>
-        <th>Rare</th>
-      </tr>
-      <tr>
-        <td>${common[0].item.name}</td>
-        <td>${uncommon[0].item.name}</td>
-        <td>${rare[0].item.name}</td>
-      </tr>
-      <tr>
-        <td>${common[1].item.name}</td>
-        <td>${uncommon[1].item.name}</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>${common[2].item.name}</td>
-        <td></td>
-        <td></td>
-      </tr>
-    </table>
-      <div class="locTableWrap scrolly">
-      <table class="centerData" id="locTable">
-        <tr>
-          <th colspan="4">Locations</th>
-        </tr>
-        <tr>
-          <th>Rarity</th>
-          <th>Odds</th>
-          <th>Location</th>
-        </tr>`
-      // <tr>
-      //   <td>${data.locations[0].missionType}</td>
-      //   <td>${data.locations[0].node}</td>
-      //   <td>${data.locations[0].rotations}</td>
-      //   <td>${data.locations[0].chance * 100}%</td>
-      // </tr>
-      // <button onclick="
-      // console.log('HELP');
-      // let locTable = document.getElementById('locTable');
-      // console.log(locTable);
-      // locTable.style.display = 'none';
-      // this.style.display = 'none';
-      // ">Hide Table</button>
-
-      data.locations.sort((first, second) => { return second.chance - first.chance });
-
-      for (const mission of data.locations) {
-        gonnaBeHTML += `
-          <tr>
-            <td>${mission.rarity}</td>
-            <td>${mission.chance * 100}%</td>
-            <td>${mission.location}</td>
-          </tr>
-        `;
-      }
-
-      gonnaBeHTML += `</table></div>`
-
-      dataField.innerHTML = gonnaBeHTML;
-
+  for (const item of dataRewards) {
+    if (item.chance > 20) {
+      rewards.common.push(item);
+    } else if (item.chance > 5) {
+      rewards.uncommon.push(item);
     } else {
-      throw `Unrecognized type: ${type}`;
+      rewards.rare.push(item);
     }
-  } catch (error) {
-    console.error(`Unable to set dataField: ${error}`);
+  }
+
+  return rewards;
+}
+
+function concatLocations(locations) {
+  let html = "";
+
+  for (const mission of locations) {
+    html += `
+      <tr>
+        <td>${mission.rarity}</td>
+        <td>${mission.chance * 100}%</td>
+        <td>${mission.location}</td>
+      </tr>
+    `;
+  }
+
+  return html;
+}
+
+function setDataRelic(data) {
+  const rewards = sortRewards(data.rewards);
+
+  let html = `
+  <table class="alignRight">
+  <tr>
+    <th colspan="3">${data.name}</th>
+  </tr>
+  <tr>
+    <th colspan="3">Drops</th>
+  </tr>
+  <tr>
+    <th>Common</th>
+    <th>Uncommon</th>
+    <th>Rare</th>
+  </tr>
+  <tr>
+    <td>${rewards.common[0].item.name}</td>
+    <td>${rewards.uncommon[0].item.name}</td>
+    <td>${rewards.rare[0].item.name}</td>
+  </tr>
+  <tr>
+    <td>${rewards.common[1].item.name}</td>
+    <td>${rewards.uncommon[1].item.name}</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>${rewards.common[2].item.name}</td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+  <div class="locTableWrap scrolly">
+  <table class="centerData" id="locTable">
+    <tr>
+      <th colspan="4">Locations</th>
+    </tr>
+    <tr>
+      <th>Rarity</th>
+      <th>Odds</th>
+      <th>Location</th>
+    </tr>`;
+
+  data.locations.sort((a, b) => {
+    return b.chance - a.chance;
+  });
+
+  html += concatLocations(data.locations);
+
+  html += `</table></div>`;
+
+  dataField.innerHTML = html;
+}
+
+function setDataFields(type, data) {
+  let dataField = document.getElementById("dataField");
+
+  if (dataField === null) {
+    throw "No dataField";
+  }
+
+  if (type == "equipment") {
+    setDataEquipment(data);
+  } else if (type == "relics") {
+    setDataRelic(data);
+  } else {
+    throw `Unrecognized type: ${type}`;
   }
 }
 
-/*
-<div class="resultItem" onclick="select(this)">
-  <div>ItemName</div>
-  <div>MR</div>
-</div>
-*/
+function selectItem(currElement, type, data) {
+  selectResult(currElement);
 
-/**
- * Connect buttons to their functions and
- *  attach listeners to their events.
- */
-function connectButtons() {
-  let searchBtn = document.getElementById("searchBtn");
-  let searchField = document.getElementById("searchField");
-  let searchType = document.getElementById("searchType");
-  let isPrime = document.getElementById("isPrime");
-  let isVaulted = document.getElementById("isVaulted");
-  let results = document.getElementById("results");
-  let helpBtn = document.getElementById("helpBtn");
-  let preview = document.getElementById("preview");
+  if (type == undefined && data == undefined) {
+    return;
+  }
 
+  console.log(data); // Provide some logging
+
+  setImage(data.imageName);
+
+  setDataFields(type, data);
+}
+
+function collectDOM() {
+  const buttons = {
+    searchBtn: document.getElementById("searchBtn"),
+    helpBtn: document.getElementById("helpBtn"),
+  };
+  const fields = {
+    isPrime: document.getElementById("isPrime"),
+    isVaulted: document.getElementById("isVaulted"),
+    results: document.getElementById("results"),
+    preview: document.getElementById("preview"),
+    searchField: document.getElementById("searchField"),
+    searchType: document.getElementById("searchType"),
+  };
+  return { buttons: buttons, fields: fields };
+}
+
+async function searchEquipment(fields) {
+  fields.preview.setAttribute("src", "./loading.gif");
+
+  let data = await db.getEquip(fields.isPrime.checked);
+  if (data == undefined) {
+    fields.preview.setAttribute("src", prevImg);
+    return;
+  }
+
+  if (fields.searchField.value !== "") {
+    data = db.filter(data, "name", searchField.value);
+  }
+
+  console.log(data);
+
+  fields.results.innerHTML = "";
+  let html = "";
+
+  for (const item of data) {
+    html += `
+    <div class="resultItem" onclick='select(this, "equipment", ${JSON.stringify(
+      item
+    )})'>
+      <div>${item.name}</div>
+      <div>MR${item.masteryReq}</div>
+    </div>`;
+  }
+
+  fields.results.innerHTML = html;
+}
+
+async function searchRelics(fields) {
+  fields.preview.setAttribute("src", "./loading.gif");
+
+  let data = await db.getRelics();
+  if (data == undefined) {
+    fields.preview.setAttribute("src", prevImg);
+    return;
+  }
+
+  if (fields.searchField.value !== "") {
+    data = db.filter(data, "name", fields.searchField.value);
+  }
+
+  data = db.filter(data, "vaulted", fields.isVaulted.checked);
+
+  console.log(data);
+
+  fields.results.innerHTML = "";
+  let html = "";
+
+  for (const relic of data) {
+    html += `
+    <div class="resultItem" onclick='select(this, "relics", ${JSON.stringify(
+      relic
+    )})'>
+      <div>${relic.name}</div>
+      <div></div>
+    </div>`;
+  }
+
+  fields.results.innerHTML = html;
+}
+
+function connectSearchBtn(searchBtn, fields) {
   searchBtn.onclick = async () => {
-    let prevImg = preview.getAttribute("src");
+    let prevImg = fields.preview.getAttribute("src");
 
-    let type = searchType.value;
+    let type = fields.searchType.value;
     /** @type {[{}]} */
     let data;
-
 
     console.log(type);
 
     if (type == "equipment") {
-      preview.setAttribute("src", "./loading.gif");
-      data = await db.getEquip(isPrime.checked);
-      if (data == undefined) {
-        preview.setAttribute("src", prevImg);
-        return;
-      }
-
-      if (searchField.value !== "") {
-        data = db.filter(data, "name", searchField.value);
-      }
-
-      console.log(data);
-
-      results.innerHTML = "";
-      let gonnaBeHTML = "";
-
-      for (const item of data) {
-        gonnaBeHTML += `
-<div class="resultItem" onclick='select(this, "${type}", ${JSON.stringify(
-          item
-        )})'>
-<div>${item.name}</div>
-<div>MR${item.masteryReq}</div>
-</div>
-`;
-      }
-
-      results.innerHTML = gonnaBeHTML;
+      await searchEquipment(fields);
     } else if (type == "relics") {
-      preview.setAttribute("src", "./loading.gif");
-
-      data = await db.getRelics();
-      if (data == undefined) {
-        preview.setAttribute("src", prevImg);
-        return;
-      }
-
-
-      if (searchField.value !== "") {
-        data = db.filter(data, "name", searchField.value);
-      }
-
-      data = db.filter(data, "vaulted", isVaulted.checked);
-
-      console.log(data);
-
-      results.innerHTML = "";
-      let gonnaBeHTML = "";
-
-      for (const relic of data) {
-        gonnaBeHTML += `
-<div class="resultItem" onclick='select(this, "${type}", ${JSON.stringify(
-          relic
-        )})'>
-<div>${relic.name}</div>
-<div>${relic.vaulted ? "" : ""}</div>
-</div>
-        `;
-      }
-
-      results.innerHTML = gonnaBeHTML;
+      await searchRelics(fields);
     } else {
       console.error(`Unrecognized type: ${type}`);
     }
 
-    preview.setAttribute("src", prevImg);
+    fields.preview.setAttribute("src", prevImg);
   };
+}
 
-  searchField.addEventListener("keypress", function (event) {
-    if (event.key == "Enter") {
-      searchBtn.click();
-    }
-  });
-
-  helpBtn.onclick = () => {
+function connectHelpBtn(button) {
+  button.onclick = () => {
     alert(`
     Welcome to the Warframe Search Tool!\n\n
     Viewing Equipment:\n
@@ -312,44 +309,62 @@ function connectButtons() {
     3. Matching entries will be shown below, click on one to view drops and location information!\n\n
     Notes:\n
     Press control then z to undo typing in the seach box.\n
-    New searches will clear the search box!
-    `);
+    New searches will clear the search box!`);
+  };
+}
+
+function updateSearchType(searchBtn) {
+  let type = searchType.value;
+  let isPrimeLabel = document.getElementById("isPrimeLabel");
+  let isVaultedLabel = document.getElementById("isVaultedLabel");
+
+  if (type === "relics") {
+    isPrimeLabel.classList.add("unavailable");
+    isPrime.disabled = true;
+
+    isVaultedLabel.classList.remove("unavailable");
+    isVaulted.disabled = false;
+  } else {
+    isPrimeLabel.classList.remove("unavailable");
+    isPrime.disabled = false;
+
+    isVaultedLabel.classList.add("unavailable");
+    isVaulted.disabled = true;
+  }
+
+  searchBtn.click();
+}
+
+function connectCheckBoxes(buttons, fields) {
+  fields.searchType.oninput = () => {
+    updateSearchType(buttons.searchBtn);
   };
 
-  searchType.oninput = () => {
-    let type = searchType.value;
-    let isPrimeLabel = document.getElementById("isPrimeLabel");
-    let isVaultedLabel = document.getElementById("isVaultedLabel");
+  fields.isPrime.oninput = () => {
+    searchBtn.click();
+  };
 
-    if (type === "relics") {
-      isPrimeLabel.classList.add("unavailable");
-      isPrime.disabled = true;
+  fields.isVaulted.oninput = () => {
+    searchBtn.click();
+  };
+}
 
-      isVaultedLabel.classList.remove("unavailable");
-      isVaulted.disabled = false;
+function connectButtons() {
+  const elements = collectDOM();
+
+  connectSearchBtn(elements.buttons.searchBtn, elements.fields);
+
+  searchField.addEventListener("keypress", function (event) {
+    if (event.key == "Enter") {
+      searchBtn.click();
     }
-    else {
-      isPrimeLabel.classList.remove("unavailable");
-      isPrime.disabled = false;
+  });
 
-      isVaultedLabel.classList.add("unavailable");
-      isVaulted.disabled = true;
-    }
+  connectHelpBtn(helpBtn);
 
-    searchBtn.click();
-  }
-
-  isPrime.oninput = () => {
-    searchBtn.click();
-  }
-
-  isVaulted.oninput = () => {
-    searchBtn.click();
-  }
+  connectCheckBoxes(elements.buttons, elements.fields);
 }
 
 connectButtons();
 
-window.select = select;
-
-console.log(ejs);
+window.select = selectItem;
